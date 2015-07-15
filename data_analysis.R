@@ -61,7 +61,8 @@ stopifnot(ncol(train.data) == nrow(feat.keep))
 ## CHECK: Let's check that all column names matches
 stopifnot(sum(names(train.data) == feat.keep$feature)==nrow(feat.keep))
 
-
+# Finally, the data can be binded into a single data frame
+training <- cbind(train.part,train.labels,train.data)
 
 #----- TESTING DATA SET
 # Let's load TEST labels, add the column names, 
