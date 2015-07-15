@@ -15,7 +15,7 @@ library(data.table)
 # Loading the activity labels
 activity.labels <- fread("UCI HAR Dataset/activity_labels.txt")
 # Changing column names
-setnames(activity.labels,c("id","activity"))
+setnames(activity.labels,c("activityID","activity"))
 # Changing all activities to lower case
 activity.labels$activity <- tolower(activity.labels$activity)
 activity.labels$activity[2] <- "walkingUp"
@@ -25,14 +25,14 @@ activity.labels$activity[3] <- "walkingDown"
 # Loading the list of features
 features <- fread("UCI HAR Dataset/features.txt")
 # Changing column names
-setnames(features,c("id","feature"))
+setnames(features,c("featID","feature"))
 
 #----- TRAINING DATA SET
-# Loading the TRAIN LABLES and changint the column name as "id"
+# Loading the TRAIN LABLES and changing the column name as "activityID"
 train.labels <- fread("UCI HAR Dataset/train/y_train.txt")
-setnames(train.labels,"id")
+setnames(train.labels,"activityID")
 # Matching each id of the training_labels data with the activity list
-train.labels[,activity:=factor(train.labels$i, labels=activity.labels$activity)]
+train.labels[,activity:=factor(train.labels$activityID, labels=activity.labels$activity)]
 # Adding a new column showing the condition (training)
 train.labels[,condition:="training"]
 
@@ -53,7 +53,7 @@ feat.keep <- feat.keep[!grepl("meanFreq()",feat.keep$feature, fixed = TRUE)]
 
 # Now, we can keep the mean and std values from the train data set
 # note that the feat.keep$id should match column index from train.data
-train.data <- train.data[,feat.keep$id]
+train.data <- train.data[,feat.keep$featID]
 
 ## ----- CHECK POINT :)
 ## CHECK: This check will ensure that the dimensions of our data frame is valid
@@ -65,18 +65,34 @@ stopifnot(sum(names(train.data) == feat.keep$feature)==nrow(feat.keep))
 training <- cbind(train.part,train.labels,train.data)
 
 #----- TESTING DATA SET
-# Let's load TEST labels, add the column names, 
-# and add a column showing the condition (testing)
-test_labels <- fread("UCI HAR Dataset/test/y_test.txt")
-setnames(test_labels,"id")
-test_labels[,condition:="testing"]
-# We can match each label of the testing data with the activity list
-test_labels$activity <- sapply(test_labels$id, 
-                    function(x) activityLabels$activity[activityLabels$id==x])
+# Loading the TEST LABLES and changing the column name as "activityID"
+test.labels <- fread("UCI HAR Dataset/test/y_test.txt")
+setnames(test.labels,"activityID")
+# Matching each id of the test.labels data with the activity list
+test.labels[,activity:=factor(test.labels$activityID, labels=activity.labels$activity)]
+# Adding a new column showing the condition (testing)
+test.labels[,condition:="testing"]
 
-# Merging all the label data
-# labels <- rbind(train_labels,test_labels)
+# Loading the participant vector from the test data
+test.part <- fread("UCI HAR Dataset/test/subject_test.txt")
+setnames(test.part, "partID")
 
+# Now, we can load the complete test data set
+test.data <- read.table("UCI HAR Dataset/test/X_test.txt")
+# Setting the column names for all the testing data set based on the features
+setnames(test.data,features$feature)
 
-# get mean(): meanFeat <- feat[grep("mean()",feat$V2,fixed= TRUE)]
-# train_data[grep("mean()",features$feature,fixed= TRUE)]
+# Since we already know which features to keep, we can apply
+test.data <- test.data[,feat.keep$featID]
+
+##----- CHECK POINT :)
+## CHECK: This check will ensure that the dimensions of the data frame is valid
+stopifnot(ncol(test.data) == nrow(feat.keep))
+## CHECK: Let's check that all column names matches
+stopifnot(sum(names(test.data) == feat.keep$feature)==nrow(feat.keep))
+
+# Finally, the data can be binded into a single data frame
+testing <- cbind(test.part,test.labels,test.data)
+
+##----- CLEANING UP
+rm(list=setdiff(ls(), c("training","testing")))
