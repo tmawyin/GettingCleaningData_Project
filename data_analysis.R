@@ -6,7 +6,6 @@
 ## http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones 
 ## If you need more information on this script, please refer to the Cookbook
 
-setwd("~/Documents/Coursera/Getting and Cleaning Data")
 # Uncomment below if you don't have the data.table package installed
 # install.packages("data.table")
 library(data.table)
@@ -55,7 +54,7 @@ feat.keep <- feat.keep[!grepl("meanFreq()",feat.keep$feature, fixed = TRUE)]
 # note that the feat.keep$id should match column index from train.data
 train.data <- train.data[,feat.keep$featID]
 
-## ----- CHECK POINT :)
+##----- CHECK POINT :)
 ## CHECK: This check will ensure that the dimensions of our data frame is valid
 stopifnot(ncol(train.data) == nrow(feat.keep))
 ## CHECK: Let's check that all column names matches
@@ -94,5 +93,35 @@ stopifnot(sum(names(test.data) == feat.keep$feature)==nrow(feat.keep))
 # Finally, the data can be binded into a single data frame
 testing <- cbind(test.part,test.labels,test.data)
 
+##----- BINDING ALL DATA
+# Combining training and testing into one full data set
+full.data <- rbind(training,testing)
+
+# Fixing the names of the columns by getting a handle on the column names
+handle.names <- names(full.data)
+# First, let's remove the ()
+handle.names <- gsub("()","",handle.names,fixed = TRUE)
+# Replacing mean and std with more appropiate names
+handle.names <- gsub("-mean","_Mean",handle.names,fixed = TRUE)
+handle.names <- gsub("-stf","_StDev",handle.names,fixed = TRUE)
+handle.names <- gsub("-","_",handle.names,fixed = TRUE)
+
+# Finally, changing the column names
+setnames(full.data, handle.names)
+
+##---- CREATING TIDY DATA
+# Splitting the data based on subject and activity, and removing unnecessary columns 
+data.split <- split( full.data[,!c("partID","activityID","activity","condition"),with=FALSE], 
+                    list(full.data$partID, full.data$activity))
+# Generating the final tidy data set
+tidy.data <- sapply(data.split, function(x) colMeans(x))
+# Organizing the tidy data set
+tidy.data <- t( tidy.data[order(rownames(tidy.data)),] )
+tidy.data<- as.data.table(tidy.data)
+
+# Writing the tidy dataset to file
+write.table(tidy.data, "tidyData.txt", row.names = FALSE)
+
 ##----- CLEANING UP
-rm(list=setdiff(ls(), c("training","testing")))
+# This will remove all variables, except the full.data set
+rm(list=setdiff(ls(), c("full.data","tidy.data")))
