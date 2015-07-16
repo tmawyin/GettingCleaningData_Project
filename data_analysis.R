@@ -96,6 +96,7 @@ testing <- cbind(test.part,test.labels,test.data)
 ##----- BINDING ALL DATA
 # Combining training and testing into one full data set
 full.data <- rbind(training,testing)
+full.data$partID <- factor(full.data$partID)
 
 # Fixing the names of the columns by getting a handle on the column names
 handle.names <- names(full.data)
@@ -117,7 +118,13 @@ data.split <- split( full.data[,!c("partID","activityID","activity","condition")
 tidy.data <- sapply(data.split, function(x) colMeans(x))
 # Organizing the tidy data set
 tidy.data <- t( tidy.data[order(rownames(tidy.data)),] )
-tidy.data<- as.data.table(tidy.data)
+tidy.data <- as.data.table(tidy.data)
+
+# Getting the set of subject and activity combinations
+sub.act.combo <- expand.grid(subject=levels(full.data$partID), 
+                             activity = levels(full.data$activity))
+
+tidy.data <- cbind(sub.act.combo, tidy.data)
 
 # Writing the tidy dataset to file
 write.table(tidy.data, "tidyData.txt", row.names = FALSE)
