@@ -41,3 +41,16 @@ This section explores the steps taken to transform the raw data into a tidy data
     This is done in three steps. First, the training labels file is loaded and two columns are added to this file. The first column matches the activity to each of the levels, i.e., for a label "1", the activity is "walking", "2"-"walkingUp", and so on. The second column specifies that these data comes from the training condition.
 
     The second step loads the subjects vector. The final step loads the complete training data set (observations and variables). Now, the columns' names of this data is changed to match the "features$feature" vector. Furthermore, the grep() function is used to remove all variables that do not match the mean and standard deviation measurements.
+
+    Finally, the *training* variable is created by binding the subjects, labels, and train data frames.
+
+* **Loading the TEST data:**
+    *A similar procedure as the already described to load the TRAIN data set is used for the TESE data.* The labels, subject, and modified test data set (removed unecessary measurements) is binded into a *testing* variable
+
+* **Binding all the data:**
+    The two data frames *training* and *testing* are then binding into a complete data set. A few modifications to the variable names are made to make them readible. The data is then split based on the subject and activity, and a new *tidy.data* frame is created by calculating the column means of each of the measurements. The resulting data frame is saved to file.
+
+* **Cleaning up:**
+    All non necessary variables are removed - the users can comment out this line to keep all the variables if desired.
+
+####3. Variables - A description of the measurements
