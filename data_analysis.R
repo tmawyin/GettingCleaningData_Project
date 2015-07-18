@@ -104,7 +104,7 @@ handle.names <- names(full.data)
 handle.names <- gsub("()","",handle.names,fixed = TRUE)
 # Replacing mean and std with more appropiate names
 handle.names <- gsub("-mean","_Mean",handle.names,fixed = TRUE)
-handle.names <- gsub("-stf","_StDev",handle.names,fixed = TRUE)
+handle.names <- gsub("-std","_StDev",handle.names,fixed = TRUE)
 handle.names <- gsub("-","_",handle.names,fixed = TRUE)
 
 # Finally, changing the column names
