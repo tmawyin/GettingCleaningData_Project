@@ -9,6 +9,7 @@
 # Uncomment below if you don't have the data.table package installed
 # install.packages("data.table")
 library(data.table)
+library(reshape2)
 
 ##----- ACTIVITY LABELS
 # Loading the activity labels
@@ -104,30 +105,37 @@ handle.names <- names(full.data)
 handle.names <- gsub("()","",handle.names,fixed = TRUE)
 # Replacing mean and std with more appropiate names
 handle.names <- gsub("-mean","_Mean",handle.names,fixed = TRUE)
-handle.names <- gsub("-stf","_StDev",handle.names,fixed = TRUE)
+handle.names <- gsub("-std","_StDev",handle.names,fixed = TRUE)
 handle.names <- gsub("-","_",handle.names,fixed = TRUE)
 
 # Finally, changing the column names
 setnames(full.data, handle.names)
 
-##---- CREATING TIDY DATA
-# Splitting the data based on subject and activity, and removing unnecessary columns 
-data.split <- split( full.data[,!c("partID","activityID","activity","condition"),with=FALSE], 
-                    list(full.data$partID, full.data$activity))
-# Generating the final tidy data set
-tidy.data <- sapply(data.split, function(x) colMeans(x))
-# Organizing the tidy data set
-tidy.data <- t( tidy.data[order(rownames(tidy.data)),] )
-tidy.data <- as.data.table(tidy.data)
-
-# Getting the set of subject and activity combinations
-sub.act.combo <- expand.grid(subject=levels(full.data$partID), 
-                             activity = levels(full.data$activity))
-
-tidy.data <- cbind(sub.act.combo, tidy.data)
+##----- CREATING TIDY DATA
+# We can melt the data by subject and activity - yields a long, skinny data set
+melteDF <- melt(full.data, id=c("partID","activity"),
+                measure.vars = colnames(full.data)[5:ncol(full.data)])
+# The tidy data set can be obtained by casting to a data frame
+tidy.data <- dcast(melteDF, partID+activity ~ variable, mean)
 
 # Writing the tidy dataset to file
 write.table(tidy.data, "tidyData.txt", row.names = FALSE)
+
+##---- ALTERNATIVE APPROACH - Uncomment below to use, overwrites tidy.data data
+# # Splitting the data based on subject and activity, and removing unnecessary columns 
+# data.split <- split( full.data[,!c("partID","activityID","activity","condition"),with=FALSE], 
+#                     list(full.data$partID, full.data$activity))
+# # Generating the final tidy data set
+# tidy.data <- sapply(data.split, function(x) colMeans(x))
+# # Organizing the tidy data set
+# tidy.data <- t( tidy.data[order(rownames(tidy.data)),] )
+# tidy.data <- as.data.table(tidy.data)
+# 
+# # Getting the set of subject and activity combinations
+# sub.act.combo <- expand.grid(subject=levels(full.data$partID), 
+#                              activity = levels(full.data$activity))
+# 
+# tidy.data <- cbind(sub.act.combo, tidy.data)
 
 ##----- CLEANING UP
 # This will remove all variables, except the full.data set
