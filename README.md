@@ -11,6 +11,12 @@ The data_analysis.R code does the following:
 * Appropriately labels the data set with descriptive variable names. 
 * Generates a second, independent tidy data set with the average of each variable for each activity and each subject.
 
+The tidy data is written into a file called tidyData.txt that can be read back to R using the command read.table("tidyData.txt",header=TRUE).
+
+The data_analysis.R code is heavily commented and is divided into clear sections for readibilty purposes. Similarly, the code uses "Checkpoints" to ensure that process goes smoothly and to catch any possible errors. 
+
+To execute the code make sure you have the data folder (UCI HAR Dataset) in the same working directory as the .R file
+
 The CodeBook.md contains the following:
 * A description of the raw data
 * Description of the variables
