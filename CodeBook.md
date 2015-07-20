@@ -48,7 +48,9 @@ This section explores the steps taken to transform the raw data into a tidy data
     *A similar procedure as the already described to load the TRAIN data set is used for the TEST data.* The labels, subject, and modified test data set (removed unecessary measurements) is binded into a *testing* variable
 
 * **Binding all the data:**
-    The two data frames *training* and *testing* are then binding into a complete data set. A few modifications to the variable names are made to make them readible. The data is then split based on the subject and activity, and a new *tidy.data* frame is created by calculating the column means of each of the measurements. The resulting data frame is saved to file.
+    The two data frames *training* and *testing* are then binding into a complete data set. A few modifications to the variable names are made to make them readible. The data is then split based on the subject and activity by using the *melt* function, and a new *tidy.data* frame is created by casting the data while calculating the mean values. The resulting data frame is saved to file.
+
+    As an alternative the data can be split and the column means of each of the measurements is calculated using *sapply*. This alternative approach is at the end of the script.  
 
 * **Cleaning up:**
     All non necessary variables are removed - the users can comment out this line to keep all the variables if desired.
@@ -57,7 +59,7 @@ This section explores the steps taken to transform the raw data into a tidy data
 
 The following are the final variables included in the tidy data set. The data file contains 180 observations and 68 variables in total. The "f" at the begining of the variable name represents the frequency domain, while the "t" represents the time domain. Finally, the X,Y,Z represents the cartesian components of each of the variables.
 
-* subject
+* partID
 * activity
 
 * fBodyAccJerk_Mean_X, Y, Z
