@@ -61,7 +61,6 @@ The following are the final variables included in the tidy data set. The data fi
 
 * partID
 * activity
-
 * fBodyAccJerk_Mean_X, Y, Z
 * fBodyAccJerk_StDev_X, Y, Z
 * fBodyAccMag_Mean
